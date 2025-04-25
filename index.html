@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive Comments Page</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to Our Colorful Wall!</h1>
+    <form id="commentForm">
+      <input type="text" id="user" placeholder="Your Name" required />
+      <textarea id="comment" placeholder="Leave a fun comment!" required></textarea>
+      <button type="submit">Post It</button>
+    </form>
+    <div class="comments-wrapper">
+      <h2>Latest Comments</h2>
+      <div id="commentsSection"></div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
