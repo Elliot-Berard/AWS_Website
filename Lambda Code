@@ -1,0 +1,45 @@
+import json
+import boto3
+import uuid
+from botocore.exceptions import ClientError
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('UserComments')  
+
+def add_cors(response):
+    response["headers"] = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+    }
+    return response
+
+def lambda_handler(event, context):
+    http_method = event['httpMethod']
+
+    if http_method == 'POST':
+        body = json.loads(event['body'])
+        comment = body.get('comment')
+        user = body.get('user', 'Anonymous')
+        if not comment:
+            return add_cors({"statusCode": 400, "body": json.dumps({"error": "Comment is required"})})
+
+        item = {
+            'commentID': str(uuid.uuid4()),
+            'user': user,
+            'comment': comment
+        }
+
+        try:
+            table.put_item(Item=item)
+            return add_cors({"statusCode": 200, "body": json.dumps({"message": "Comment added"})})
+        except ClientError as e:
+            return add_cors({"statusCode": 500, "body": json.dumps({"error": str(e)})})
+
+    elif http_method == 'GET':
+        try:
+            response = table.scan()
+            return add_cors({"statusCode": 200, "body": json.dumps(response.get('Items', []))})
+        except ClientError as e:
+            return add_cors({"statusCode": 500, "body": json.dumps({"error": str(e)})})
+            return add_cors({"statusCode": 405, "body": json.dumps({"error": "Method not allowed"})})
